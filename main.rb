@@ -2,13 +2,23 @@ def wget(uri, destination)
   run "wget --no-check-certificate #{uri} -O #{destination}"
 end
 
-run "git init" unless File.exist?(".git")
-
 @root = File.expand_path(File.directory?('') ? '' : File.join(Dir.pwd, ''))
 @project = @root.split("/").last
 
 @after_blocks = []
 def after_bundler(&block); @after_blocks << block; end
+
+@rvm_envs = [
+  "PATH=/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@#{@project}/bin:/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@global/bin:/Users/pivotal/.rvm/rubies/ree-1.8.7-2010.02/bin:/Users/pivotal/.rvm/bin:$PATH",
+  "GEM_HOME=/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@#{@project}",
+  "GEM_PATH=/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@#{@project}:/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@global",
+  "BUNDLE_PATH=/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@#{@project}",
+  "MY_RUBY_HOME=/Users/pivotal/.rvm/rubies/ree-1.8.7-2010.02",
+  "IRBRC=/Users/pivotal/.rvm/rubies/ree-1.8.7-2010.02/.irbc"
+  ].join(' ')
+
+# git
+run "git init" unless File.exist?(".git")
 
 # jquery
 inside "public/javascripts" do
@@ -23,7 +33,6 @@ end
 
 gsub_file "config/application.rb", /# JavaScript.*\n/, ""
 gsub_file "config/application.rb", /# config\.action_view\.javascript.*\n/, ""
-
 
 # gems
 create_file ".rvmrc", "rvm --create ree-1.8.7-2010.02@#{@project}"
@@ -50,14 +59,18 @@ gem 'heroku'
 
 if yes?("Do you want to use MySQL?")
   gem 'mysql2', '0.2.6'
+  @database = 'mysql'
 elsif yes?("Or PostgreSql?")
-  gem 'pg', '0.9.0', :group => :test
+  gem 'pg', '0.9.0'
+  @database = 'postgresql'
 end
 
 if yes?("Do you want RR?")
   @test_gems.push("gem 'rr', '1.0.2'")
+  @mock_framework = 'rr'
 elsif yes?("Or mocha?")
   @test_gems.push("gem 'mocha', '0.9.9'")
+  @mock_framework = 'mocha'
 end
 
 if yes?("Do you want to use Webrat with Sauce Labs support?")
@@ -68,14 +81,14 @@ if yes?("Do you want to use Webrat with Sauce Labs support?")
   @dev_test_gems.push("gem 'saucelabs-adapter', '0.8.22'")
 
   after_bundler do
-    generate 'saucelabs_adapter'
+    run "#{@rvm_envs} rails g saucelabs_adapter"
   end
 elsif yes?("Or Cucumber with Capybara (doesn't work with Sauce Labs)?")
   @dev_test_gems.push("gem 'cucumber-rails', '0.3.2'")
   @dev_test_gems.push("gem 'capybara', '0.4.0'")
 
   after_bundler do
-    generate "cucumber:install --capybara --rspec"
+    run "#{@rvm_envs} rails g cucumber:install --capybara --rspec"
   end
 end
 
@@ -116,7 +129,70 @@ end
   GROUPS
 end
 
+after_bundler do
+  run "#{@rvm_envs} rails g rspec:install"
+end
+
+run "#{@rvm_envs} gem install bundler"
+
 say "Running Bundler install. This will take a while."
-run 'bundle install'
+run "#{@rvm_envs} bundle install"
+
 say "Running after Bundler callbacks."
 @after_blocks.each{|b| b.call}
+
+# final cleanups
+
+remove_dir "test"
+
+# update rspec mocking framework
+if @mock_framework
+  gsub_file 'spec/spec_helper.rb', "# config.mock_with :#{@mock_framework}", "config.mock_with :#{@mock_framework}"
+  gsub_file 'spec/spec_helper.rb', "config.mock_with :rspec", "# config.mock_with :rspec"
+end
+
+file "spec/models/dummy_spec.rb" do <<-EOS
+require 'spec_helper'
+
+describe "Dummy spec" do
+  it "should pass" do
+    1.should == 1
+  end
+
+  xit "It supports disabled specs" do
+    1.should == 1
+  end
+
+  it "supports unimplemented specs"
+end
+EOS
+end
+
+# update database.yml
+if @database
+  remove_file "config/database.yml"
+  file "config/database.yml" do <<-EOS
+  development: &development
+    adapter: #{@database == 'mysql' ? 'mysql2' : 'postgresql'}
+    database: #{@project}_dev
+    username: #{@database == 'mysql' ? 'root' : 'postgres'}
+    password: #{@database == 'mysql' ? 'password' : ''}
+    host: localhost
+    #socket: /tmp/mysql.sock
+
+  # Warning: The database defined as 'test' will be erased and
+  # re-generated from your development database when you run 'rake'.
+  # Do not set this db to the same as development or production.
+  test:
+    <<: *development
+    database: #{@project}_test
+
+  production:
+    <<: *development
+    database: #{@project}_production
+  EOS
+  end
+end
+
+# setup database
+run "#{@rvm_envs} rake db:create:all db:migrate"
