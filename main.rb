@@ -81,8 +81,12 @@ if yes?("Do you want to use Webrat with Sauce Labs support?")
   @dev_test_gems.push("gem 'rest-client', '1.6.1'")
   @dev_test_gems.push("gem 'saucelabs-adapter', '0.8.22'")
 
+  @saucelabs = true
+
   after_bundler do
     run "#{@rvm_envs} rails g saucelabs_adapter"
+    gsub_file "config/selenium.yml", "YOUR-SAUCELABS-USERNAME", "pivotallabs"
+    gsub_file "config/selenium.yml", "YOUR-SAUCELABS-ACCESS-KEY", "YOURSAUCEAPIKEY"
   end
 elsif yes?("Or Cucumber with Capybara (doesn't work with Sauce Labs)?")
   @dev_test_gems.push("gem 'cucumber-rails', '0.3.2'")
@@ -136,6 +140,17 @@ end
 after_bundler do
   run "#{@rvm_envs} rails g rspec:install"
 
+  if @saucelabs
+    prepend_file "spec/spec_helper.rb" do
+      <<-SAUCE
+      ENV['SELENIUM_ENV'] ||= 'saucelabs'
+      require 'selenium/client'
+      require 'saucelabs_adapter'
+      require 'saucelabs_adapter/rspec_adapter'
+      SAUCE
+    end
+  end
+
   # jasmine rails 3 hack
   jasmine_path = `#{@rvm_envs} bundle show jasmine`.chomp
   copy_file File.join(jasmine_path, 'generators', 'jasmine', 'templates', 'spec', 'javascripts', 'support', 'jasmine-rails.yml'), 'spec/javascripts/support/jasmine.yml'
@@ -146,7 +161,7 @@ after_bundler do
   copy_file File.join(jasmine_path, 'jasmine', 'example', 'src', 'Song.js'), 'public/javascripts/Song.js'
   copy_file File.join(jasmine_path, 'jasmine', 'example', 'spec', 'SpecHelper.js'), 'spec/javascripts/helpers/SpecHelper.js'
   copy_file File.join(jasmine_path, 'jasmine', 'example', 'spec', 'PlayerSpec.js'), 'spec/javascripts/PlayerSpec.js'
-#  run "#{@rvm_envs} bundle exec jasmine init"
+
 end
 
 #run "#{@rvm_envs} gem install bundler"
@@ -227,6 +242,18 @@ describe "Dummy spec" do
   end
 
   it "supports unimplemented specs"
+end
+EOS
+end
+
+file "spec/view/index_spec.rb" do <<-EOS
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
+describe 'Google Search' do
+  it 'can find Google' do
+    @browser.open '/'
+    @browser.title.should eql('Google')
+  end
 end
 EOS
 end
