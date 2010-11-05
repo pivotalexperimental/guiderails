@@ -16,6 +16,7 @@ def after_bundler(&block); @after_blocks << block; end
   "MY_RUBY_HOME=/Users/pivotal/.rvm/rubies/ree-1.8.7-2010.02",
   "IRBRC=/Users/pivotal/.rvm/rubies/ree-1.8.7-2010.02/.irbc"
   ].join(' ')
+@rvm_envs = ''
 
 # git
 run "git init" unless File.exist?(".git")
@@ -35,7 +36,7 @@ gsub_file "config/application.rb", /# JavaScript.*\n/, ""
 gsub_file "config/application.rb", /# config\.action_view\.javascript.*\n/, ""
 
 # gems
-create_file ".rvmrc", "rvm --create ree-1.8.7-2010.02@#{@project}"
+#create_file ".rvmrc", "rvm --create ree-1.8.7-2010.02@#{@project}"
 
 # clean up Gemfile
 gsub_file 'Gemfile', /gem 'sqlite/, "# gem 'sqlite"
@@ -114,7 +115,10 @@ append_file "Gemfile" do
 group :development, :test do
   gem 'mongrel', '1.1.5'
   gem 'rspec-rails', '2.0.1'
-  gem 'jasmine', '1.0.1'
+  gem 'jasmine', :git => "git://github.com/pivotal/jasmine-gem.git",
+    :branch => "rspec2-rails3",
+    :submodules => true
+
   #{@dev_test_gems.join(delimiter)}
 end
 
@@ -131,9 +135,21 @@ end
 
 after_bundler do
   run "#{@rvm_envs} rails g rspec:install"
+
+  # jasmine rails 3 hack
+  jasmine_path = `#{@rvm_envs} bundle show jasmine`.chomp
+  copy_file File.join(jasmine_path, 'generators', 'jasmine', 'templates', 'spec', 'javascripts', 'support', 'jasmine-rails.yml'), 'spec/javascripts/support/jasmine.yml'
+  copy_file File.join(jasmine_path, 'generators', 'jasmine', 'templates', 'spec', 'javascripts', 'support', 'jasmine_runner.rb'), 'spec/javascripts/support/jasmine_runner.rb'
+  copy_file File.join(jasmine_path, 'lib', 'jasmine', 'tasks', 'jasmine.rake'), 'lib/tasks/jasmine.rake'
+
+  copy_file File.join(jasmine_path, 'jasmine', 'example', 'src', 'Player.js'), 'public/javascripts/Player.js'
+  copy_file File.join(jasmine_path, 'jasmine', 'example', 'src', 'Song.js'), 'public/javascripts/Song.js'
+  copy_file File.join(jasmine_path, 'jasmine', 'example', 'spec', 'SpecHelper.js'), 'spec/javascripts/helpers/SpecHelper.js'
+  copy_file File.join(jasmine_path, 'jasmine', 'example', 'spec', 'PlayerSpec.js'), 'spec/javascripts/PlayerSpec.js'
+#  run "#{@rvm_envs} bundle exec jasmine init"
 end
 
-run "#{@rvm_envs} gem install bundler"
+#run "#{@rvm_envs} gem install bundler"
 
 say "Running Bundler install. This will take a while."
 run "#{@rvm_envs} bundle install"
@@ -149,23 +165,6 @@ remove_dir "test"
 if @mock_framework
   gsub_file 'spec/spec_helper.rb', "# config.mock_with :#{@mock_framework}", "config.mock_with :#{@mock_framework}"
   gsub_file 'spec/spec_helper.rb', "config.mock_with :rspec", "# config.mock_with :rspec"
-end
-
-file "spec/models/dummy_spec.rb" do <<-EOS
-require 'spec_helper'
-
-describe "Dummy spec" do
-  it "should pass" do
-    1.should == 1
-  end
-
-  xit "It supports disabled specs" do
-    1.should == 1
-  end
-
-  it "supports unimplemented specs"
-end
-EOS
 end
 
 # update database.yml
@@ -196,3 +195,38 @@ end
 
 # setup database
 run "#{@rvm_envs} rake db:create:all db:migrate"
+
+# create tests
+file "spec/models/dummy_spec.rb" do <<-EOS
+require 'spec_helper'
+
+describe "Dummy spec" do
+  it "should pass" do
+    1.should == 1
+  end
+
+  xit "It supports disabled specs" do
+    1.should == 1
+  end
+
+  it "supports unimplemented specs"
+end
+EOS
+end
+
+file "spec/models/dummy_spec.rb" do <<-EOS
+require 'spec_helper'
+
+describe "Dummy spec" do
+  it "should pass" do
+    1.should == 1
+  end
+
+  xit "It supports disabled specs" do
+    1.should == 1
+  end
+
+  it "supports unimplemented specs"
+end
+EOS
+end
