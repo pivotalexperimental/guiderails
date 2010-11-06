@@ -79,10 +79,8 @@ if yes?("Do you want to use Webrat with Sauce Labs support?")
   @dev_test_gems.push("gem 'net-ssh', '2.0.23'")
   @dev_test_gems.push("gem 'net-ssh-gateway', '1.0.1'")
   @dev_test_gems.push("gem 'rest-client', '1.6.1'")
-  @dev_test_gems.push("gem 'saucelabs-adapter', '0.8.22'")
-
-  @saucelabs = true
-
+  @dev_test_gems.push("gem 'saucelabs_adapter', :git => 'git://github.com/pivotal/saucelabs-adapter.git', :branch => 'rails3', :submodules => true")
+  
   after_bundler do
     run "#{@rvm_envs} rails g saucelabs_adapter"
     gsub_file "config/selenium.yml", "YOUR-SAUCELABS-USERNAME", "pivotallabs"
@@ -140,17 +138,6 @@ end
 after_bundler do
   run "#{@rvm_envs} rails g rspec:install"
 
-  if @saucelabs
-    prepend_file "spec/spec_helper.rb" do
-      <<-SAUCE
-      ENV['SELENIUM_ENV'] ||= 'saucelabs'
-      require 'selenium/client'
-      require 'saucelabs_adapter'
-      require 'saucelabs_adapter/rspec_adapter'
-      SAUCE
-    end
-  end
-
   # jasmine rails 3 hack
   jasmine_path = `#{@rvm_envs} bundle show jasmine`.chomp
   copy_file File.join(jasmine_path, 'generators', 'jasmine', 'templates', 'spec', 'javascripts', 'support', 'jasmine-rails.yml'), 'spec/javascripts/support/jasmine.yml'
@@ -164,7 +151,7 @@ after_bundler do
 
 end
 
-#run "#{@rvm_envs} gem install bundler"
+run "#{@rvm_envs} gem install bundler"
 
 say "Running Bundler install. This will take a while."
 run "#{@rvm_envs} bundle install"
@@ -242,18 +229,6 @@ describe "Dummy spec" do
   end
 
   it "supports unimplemented specs"
-end
-EOS
-end
-
-file "spec/view/index_spec.rb" do <<-EOS
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
-describe 'Google Search' do
-  it 'can find Google' do
-    @browser.open '/'
-    @browser.title.should eql('Google')
-  end
 end
 EOS
 end
