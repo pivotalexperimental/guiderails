@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 source $HOME/.rvm/scripts/rvm && source .rvmrc
 
