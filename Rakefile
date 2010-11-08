@@ -26,13 +26,13 @@ namespace :rails3_templates do
         run "CRUISE=true TEMPLATE_PROJECT_PATH=#{template_project_path} " +
                 "SAUCELABS_USERNAME=pivotallabs " +
                 "SAUCELABS_ACCESS_KEY=YOURSAUCEAPIKEY " +
-                "rails _3.0.1_ #{test_project_filename} -m #{template_project_path}/main.rb"
+                "rails new #{test_project_filename} -m #{template_project_path}/main.rb -J -T"
       end
       cd test_project_path do
-        run "git init"
         run "rake spec"
-#        run "rake jasmine:ci"
-#        run "rake selenium:sauce" # unless RUBY_PLATFORM =~ /linux/
+        run "rake jasmine:ci"
+        run "rake spec:selenium"
+        run "rake spec:selenium:sauce"
       end
     end
   end

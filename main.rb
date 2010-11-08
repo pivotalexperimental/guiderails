@@ -17,6 +17,22 @@ def after_bundler(&block); @after_blocks << block; end
   "IRBRC=/Users/pivotal/.rvm/rubies/ree-1.8.7-2010.02/.irbc"
   ].join(' ')
 
+if ENV["CRUISE"]
+  puts "Mocking responses for Cruise.rb"
+  @responses = {
+    "Do you want to use MySQL?" => "yes",
+    "Do you want RR?" => "yes",
+    "Do you want to use Webrat with Sauce Labs support?" => "yes",
+    "Do you want the HAML (and SASS) gem?" => "yes"
+  }
+
+  def yes?(question)
+    log '', question
+    log 'Response mocked - ', @responses[question]
+    @responses[question]
+  end
+end
+
 # git
 run "git init" unless File.exist?(".git")
 
