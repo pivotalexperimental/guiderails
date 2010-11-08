@@ -22,6 +22,7 @@ namespace :rails3_templates do
     FileUtils.mkdir_p(test_project_dir)
     begin
       template_project_path = File.dirname(__FILE__)
+      run "rvm rvmrc trust #{test_project_path}"
       cd test_project_dir do
         run "CRUISE=true TEMPLATE_PROJECT_PATH=#{template_project_path} " +
                 "SAUCELABS_USERNAME=pivotallabs " +
