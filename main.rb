@@ -181,7 +181,7 @@ if @database
     username: #{@database == 'mysql' ? 'root' : 'postgres'}
     password: #{@database == 'mysql' ? 'password' : ''}
     host: localhost
-    #socket: /tmp/mysql.sock
+    #{ENV['CRUISE'] && @database == 'mysql' ? 'socket: /tmp/mysql.sock' : ''}
 
   # Warning: The database defined as 'test' will be erased and
   # re-generated from your development database when you run 'rake'.
