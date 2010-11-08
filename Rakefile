@@ -30,6 +30,7 @@ namespace :rails3_templates do
       end
       run "rvm rvmrc trust #{test_project_path}"
       cd test_project_path do
+        run 'bundle install'
         run "rake spec"
         run "rake jasmine:ci"
         run "rake spec:selenium"
