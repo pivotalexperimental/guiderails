@@ -22,13 +22,13 @@ namespace :rails3_templates do
     FileUtils.mkdir_p(test_project_dir)
     begin
       template_project_path = File.dirname(__FILE__)
-      run "rvm rvmrc trust #{test_project_path}"
       cd test_project_dir do
         run "CRUISE=true TEMPLATE_PROJECT_PATH=#{template_project_path} " +
                 "SAUCELABS_USERNAME=pivotallabs " +
                 "SAUCELABS_ACCESS_KEY=YOURSAUCEAPIKEY " +
                 "rails new #{test_project_filename} -m #{template_project_path}/main.rb -J -T"
       end
+      run "rvm rvmrc trust #{test_project_path}"
       cd test_project_path do
         run "rake spec"
         run "rake jasmine:ci"
