@@ -8,14 +8,22 @@ end
 @after_blocks = []
 def after_bundler(&block); @after_blocks << block; end
 
-@rvm_envs = [
-  "PATH=/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@#{@project}/bin:/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@global/bin:/Users/pivotal/.rvm/rubies/ree-1.8.7-2010.02/bin:/Users/pivotal/.rvm/bin:$PATH",
-  "GEM_HOME=/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@#{@project}",
-  "GEM_PATH=/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@#{@project}:/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@global",
-  "BUNDLE_PATH=/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@#{@project}",
-  "MY_RUBY_HOME=/Users/pivotal/.rvm/rubies/ree-1.8.7-2010.02",
-  "IRBRC=/Users/pivotal/.rvm/rubies/ree-1.8.7-2010.02/.irbc"
-  ].join(' ')
+@rvm_envs = 
+    if ENV["CRUISE"]
+      @rvm_envs = ["PATH=/home/pivotal/.rvm/gems/ree-1.8.7-2010.02@#{@project}/bin:/home/pivotal/.rvm/gems/ree-1.8.7-2010.02@global/bin:/home/pivotal/.rvm/rubies/ree-1.8.7-2010.02/bin:/home/pivotal/.rvm/bin:$PATH",
+      "GEM_HOME=/home/pivotal/.rvm/gems/ree-1.8.7-2010.02@#{@project}",
+      "GEM_PATH=/home/pivotal/.rvm/gems/ree-1.8.7-2010.02@#{@project}:/home/pivotal/.rvm/gems/ree-1.8.7-2010.02@global",
+      "BUNDLE_PATH=/home/pivotal/.rvm/gems/ree-1.8.7-2010.02@#{@project}",
+      "MY_RUBY_HOME=/home/pivotal/.rvm/rubies/ree-1.8.7-2010.02",
+      "IRBRC=/home/pivotal/.rvm/rubies/ree-1.8.7-2010.02/.irbc"]
+    else
+      ["PATH=/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@#{@project}/bin:/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@global/bin:/Users/pivotal/.rvm/rubies/ree-1.8.7-2010.02/bin:/Users/pivotal/.rvm/bin:$PATH",
+      "GEM_HOME=/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@#{@project}",
+      "GEM_PATH=/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@#{@project}:/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@global",
+      "BUNDLE_PATH=/Users/pivotal/.rvm/gems/ree-1.8.7-2010.02@#{@project}",
+      "MY_RUBY_HOME=/Users/pivotal/.rvm/rubies/ree-1.8.7-2010.02",
+      "IRBRC=/Users/pivotal/.rvm/rubies/ree-1.8.7-2010.02/.irbc"]
+  end.join(' ')
 
 if ENV["CRUISE"]
   puts "Mocking responses for Cruise.rb"
