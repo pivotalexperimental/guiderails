@@ -16,7 +16,6 @@ def after_bundler(&block); @after_blocks << block; end
   "MY_RUBY_HOME=/Users/pivotal/.rvm/rubies/ree-1.8.7-2010.02",
   "IRBRC=/Users/pivotal/.rvm/rubies/ree-1.8.7-2010.02/.irbc"
   ].join(' ')
-@rvm_envs = ''
 
 # git
 run "git init" unless File.exist?(".git")
@@ -98,21 +97,17 @@ end
 if yes?("Do you want the HAML (and SASS) gem?")
   gem 'haml', '>= 3.0.0'
   gem 'haml-rails'
-  @haml_installed = true
 end
 
 # gemfile injections
 
 append_file "Gemfile" do
-  delimiter = "  \n"
+  delimiter = "\n  "
   <<-GROUPS
 
 group :development, :test do
   gem 'mongrel', '1.1.5'
   gem 'rspec-rails', '2.0.1'
-#  gem 'jasmine', :git => "git://github.com/pivotal/jasmine-gem.git",
-#    :branch => "rspec2-rails3",
-#    :submodules => true
   gem 'jasmine', '1.0.1.1rc2'
 
   #{@dev_test_gems.join(delimiter)}
@@ -132,17 +127,6 @@ end
 after_bundler do
   run "#{@rvm_envs} rails g rspec:install"
   run "#{@rvm_envs} bundle exec jasmine init"
-  # jasmine rails 3 hack
-#  jasmine_path = `#{@rvm_envs} bundle show jasmine`.chomp
-#  copy_file File.join(jasmine_path, 'generators', 'jasmine', 'templates', 'spec', 'javascripts', 'support', 'jasmine-rails.yml'), 'spec/javascripts/support/jasmine.yml'
-#  copy_file File.join(jasmine_path, 'generators', 'jasmine', 'templates', 'spec', 'javascripts', 'support', 'jasmine_runner.rb'), 'spec/javascripts/support/jasmine_runner.rb'
-#  copy_file File.join(jasmine_path, 'lib', 'jasmine', 'tasks', 'jasmine.rake'), 'lib/tasks/jasmine.rake'
-#
-#  copy_file File.join(jasmine_path, 'jasmine', 'example', 'src', 'Player.js'), 'public/javascripts/Player.js'
-#  copy_file File.join(jasmine_path, 'jasmine', 'example', 'src', 'Song.js'), 'public/javascripts/Song.js'
-#  copy_file File.join(jasmine_path, 'jasmine', 'example', 'spec', 'SpecHelper.js'), 'spec/javascripts/helpers/SpecHelper.js'
-#  copy_file File.join(jasmine_path, 'jasmine', 'example', 'spec', 'PlayerSpec.js'), 'spec/javascripts/PlayerSpec.js'
-
 end
 
 run "#{@rvm_envs} gem install bundler"
@@ -208,4 +192,30 @@ describe "Dummy spec" do
   it "supports unimplemented specs"
 end
 EOS
+end
+
+#create rspec.rake override to prevent autorun of selenium tests
+file "lib/tasks/rspec.rake" do <<-FILE
+require 'rake'
+
+class Rake::Task
+  def overwrite(&block)
+    @actions.clear
+    prerequisites.clear
+    enhance(&block)
+  end
+  def abandon
+    prerequisites.clear
+    @actions.clear
+  end
+end
+
+Rake::Task[:spec].abandon
+
+#[:requests, :models, :controllers, :views, :helpers, :mailers, :lib, :routing].each do |sub|
+desc "Run all specs in spec/"
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.pattern = "./spec/{requests,models,controllers,views,helpers,mailers,lib,routing}/**/*_spec.rb"
+end
+FILE
 end
