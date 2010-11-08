@@ -36,7 +36,7 @@ gsub_file "config/application.rb", /# JavaScript.*\n/, ""
 gsub_file "config/application.rb", /# config\.action_view\.javascript.*\n/, ""
 
 # gems
-#create_file ".rvmrc", "rvm --create ree-1.8.7-2010.02@#{@project}"
+create_file ".rvmrc", "rvm --create ree-1.8.7-2010.02@#{@project}"
 
 # clean up Gemfile
 gsub_file 'Gemfile', /gem 'sqlite/, "# gem 'sqlite"
@@ -95,17 +95,10 @@ elsif yes?("Or Cucumber with Capybara (doesn't work with Sauce Labs)?")
   end
 end
 
-@haml_installed = false
-if yes?("Do you want to use HAML?")
+if yes?("Do you want the HAML (and SASS) gem?")
   gem 'haml', '>= 3.0.0'
   gem 'haml-rails'
   @haml_installed = true
-end
-
-if yes?("Do you want to use SASS?")
-  unless @haml_installed
-    gem 'haml', '>= 3.0.0'
-  end  
 end
 
 # gemfile injections
@@ -117,9 +110,10 @@ append_file "Gemfile" do
 group :development, :test do
   gem 'mongrel', '1.1.5'
   gem 'rspec-rails', '2.0.1'
-  gem 'jasmine', :git => "git://github.com/pivotal/jasmine-gem.git",
-    :branch => "rspec2-rails3",
-    :submodules => true
+#  gem 'jasmine', :git => "git://github.com/pivotal/jasmine-gem.git",
+#    :branch => "rspec2-rails3",
+#    :submodules => true
+  gem 'jasmine', '1.0.1.1rc2'
 
   #{@dev_test_gems.join(delimiter)}
 end
@@ -137,17 +131,17 @@ end
 
 after_bundler do
   run "#{@rvm_envs} rails g rspec:install"
-
+  run "#{@rvm_envs} bundle exec jasmine init"
   # jasmine rails 3 hack
-  jasmine_path = `#{@rvm_envs} bundle show jasmine`.chomp
-  copy_file File.join(jasmine_path, 'generators', 'jasmine', 'templates', 'spec', 'javascripts', 'support', 'jasmine-rails.yml'), 'spec/javascripts/support/jasmine.yml'
-  copy_file File.join(jasmine_path, 'generators', 'jasmine', 'templates', 'spec', 'javascripts', 'support', 'jasmine_runner.rb'), 'spec/javascripts/support/jasmine_runner.rb'
-  copy_file File.join(jasmine_path, 'lib', 'jasmine', 'tasks', 'jasmine.rake'), 'lib/tasks/jasmine.rake'
-
-  copy_file File.join(jasmine_path, 'jasmine', 'example', 'src', 'Player.js'), 'public/javascripts/Player.js'
-  copy_file File.join(jasmine_path, 'jasmine', 'example', 'src', 'Song.js'), 'public/javascripts/Song.js'
-  copy_file File.join(jasmine_path, 'jasmine', 'example', 'spec', 'SpecHelper.js'), 'spec/javascripts/helpers/SpecHelper.js'
-  copy_file File.join(jasmine_path, 'jasmine', 'example', 'spec', 'PlayerSpec.js'), 'spec/javascripts/PlayerSpec.js'
+#  jasmine_path = `#{@rvm_envs} bundle show jasmine`.chomp
+#  copy_file File.join(jasmine_path, 'generators', 'jasmine', 'templates', 'spec', 'javascripts', 'support', 'jasmine-rails.yml'), 'spec/javascripts/support/jasmine.yml'
+#  copy_file File.join(jasmine_path, 'generators', 'jasmine', 'templates', 'spec', 'javascripts', 'support', 'jasmine_runner.rb'), 'spec/javascripts/support/jasmine_runner.rb'
+#  copy_file File.join(jasmine_path, 'lib', 'jasmine', 'tasks', 'jasmine.rake'), 'lib/tasks/jasmine.rake'
+#
+#  copy_file File.join(jasmine_path, 'jasmine', 'example', 'src', 'Player.js'), 'public/javascripts/Player.js'
+#  copy_file File.join(jasmine_path, 'jasmine', 'example', 'src', 'Song.js'), 'public/javascripts/Song.js'
+#  copy_file File.join(jasmine_path, 'jasmine', 'example', 'spec', 'SpecHelper.js'), 'spec/javascripts/helpers/SpecHelper.js'
+#  copy_file File.join(jasmine_path, 'jasmine', 'example', 'spec', 'PlayerSpec.js'), 'spec/javascripts/PlayerSpec.js'
 
 end
 
@@ -199,23 +193,6 @@ end
 run "#{@rvm_envs} rake db:create:all db:migrate"
 
 # create tests
-file "spec/models/dummy_spec.rb" do <<-EOS
-require 'spec_helper'
-
-describe "Dummy spec" do
-  it "should pass" do
-    1.should == 1
-  end
-
-  xit "It supports disabled specs" do
-    1.should == 1
-  end
-
-  it "supports unimplemented specs"
-end
-EOS
-end
-
 file "spec/models/dummy_spec.rb" do <<-EOS
 require 'spec_helper'
 
