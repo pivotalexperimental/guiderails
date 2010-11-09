@@ -98,7 +98,7 @@ if yes?("Do you want to use Webrat with Sauce Labs support?")
   @dev_test_gems.push("gem 'saucelabs_adapter', :git => 'git://github.com/pivotal/saucelabs-adapter.git', :branch => 'rails3', :submodules => true")
   
   after_bundler do
-    run "#{@rvm_envs} rails g saucelabs_adapter"
+    run_ruby "rails g saucelabs_adapter"
     gsub_file "config/selenium.yml", "YOUR-SAUCELABS-USERNAME", "pivotallabs"
     gsub_file "config/selenium.yml", "YOUR-SAUCELABS-ACCESS-KEY", "YOURSAUCEAPIKEY"
   end
@@ -107,7 +107,7 @@ elsif yes?("Or Cucumber with Capybara (doesn't work with Sauce Labs)?")
   @dev_test_gems.push("gem 'capybara', '0.4.0'")
 
   after_bundler do
-    run "#{@rvm_envs} rails g cucumber:install --capybara --rspec"
+    run_ruby "rails g cucumber:install --capybara --rspec"
   end
 end
 
@@ -140,15 +140,17 @@ end
   GROUPS
 end
 
+# installation scripts for default gems
 after_bundler do
-  run "#{@rvm_envs} rails g rspec:install"
-  run "#{@rvm_envs} bundle exec jasmine init"
+  run_ruby "rails g rspec:install"
+  run_ruby "bundle exec jasmine init"
 end
 
-run "#{@rvm_envs} gem install bundler"
+# run bundler
+run_ruby "gem install bundler"
 
 say "Running Bundler install. This will take a while."
-run "#{@rvm_envs} bundle install"
+run_ruby "bundle install"
 
 say "Running after Bundler callbacks."
 @after_blocks.each{|b| b.call}
