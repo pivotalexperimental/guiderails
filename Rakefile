@@ -32,6 +32,7 @@ namespace :rails3_templates do
       cd test_project_path do
         run 'bundle install'
         run "rake spec"
+        run "nohup Xvfb :5.0 -screen 0 1024x768x8 &"
         run "DISPLAY=:5.0 rake jasmine:ci"
         run "DISPLAY=:5.0 rake spec:selenium"
         run "DISPLAY=:5.0 rake spec:selenium:sauce"
