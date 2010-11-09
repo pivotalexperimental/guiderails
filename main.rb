@@ -129,7 +129,7 @@ append_file "Gemfile" do
 group :development, :test do
   gem 'mongrel', '1.1.5'
   gem 'rspec-rails', '2.0.1'
-  gem 'jasmine', '1.0.1.1rc2'
+  gem 'jasmine', '1.0.1.1'
 
   #{@dev_test_gems.join(delimiter)}
 end
