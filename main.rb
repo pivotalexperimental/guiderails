@@ -20,15 +20,15 @@ run "rvm wrapper ree-1.8.7-2010.02@#{@project} #{@project}"
 if ENV["CRUISE"]
   puts "Mocking responses for Cruise.rb"
   @responses = {
-    "Do you want to use MySQL?" => "yes",
-    "Do you want RR?" => "yes",
-    "Do you want to use Webrat with Sauce Labs support?" => "yes",
-    "Do you want the HAML (and SASS) gem?" => "yes"
+    "Do you want to use MySQL?" => true,
+    "Do you want RR?" => true,
+    "Do you want to use Webrat with Sauce Labs support?" => true,
+    "Do you want the HAML (and SASS) gem?" => true
   }
 
-  if (ENV['TEMPLATE_DB'] == 'psql')
-    @responses['Do you want to use MySQL?'] = "no"
-    @responses["Or PostgreSql?"]  = "yes"
+  if (ENV['TEMPLATE_DB'] == 'postgresql')
+    @responses['Do you want to use MySQL?'] = false
+    @responses["Or PostgreSql?"]  = true
   end
 
   def yes?(question)
@@ -177,7 +177,7 @@ if @database
     adapter: #{@database == 'mysql' ? 'mysql2' : 'postgresql'}
     database: #{@project}_dev
     username: #{@database == 'mysql' ? 'root' : 'postgres'}
-    password: #{@database == 'mysql' ? 'password' : ''}
+    password: #{@database == 'mysql' || ENV['CRUISE'] ? 'password' : ''}
     host: localhost
     #{ENV['CRUISE'] && @database == 'mysql' ? 'socket: /tmp/mysql.sock' : ''}
 
