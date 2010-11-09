@@ -32,9 +32,9 @@ namespace :rails3_templates do
       cd test_project_path do
         run 'bundle install'
         run "rake spec"
-        run "rake jasmine:ci"
-        run "rake spec:selenium"
-        run "rake spec:selenium:sauce"
+        run "DISPLAY=:5.0 rake jasmine:ci"
+        run "DISPLAY=:5.0 rake spec:selenium"
+        run "DISPLAY=:5.0 rake spec:selenium:sauce"
       end
     end
   end
