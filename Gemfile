@@ -1,3 +1,3 @@
 source :gemcutter
 
-gem "thor", "0.14.3"
+gem "rails", "3.0.1"
