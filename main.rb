@@ -26,6 +26,11 @@ if ENV["CRUISE"]
     "Do you want the HAML (and SASS) gem?" => "yes"
   }
 
+  if (ENV['TEMPLATE_DB'] == 'psql')
+    @responses['Do you want to use MySQL?'] = "no"
+    @responses["Or PostgreSql?"]  = "yes"
+  end
+
   def yes?(question)
     log '', question
     log 'Response mocked - ', @responses[question]
