@@ -46,6 +46,7 @@ namespace :rails3_templates do
     end
     FileUtils.mkdir_p(TEST_PROJECT_DIR)
 
+    run_test_project
     run_test_project 'TEMPLATE_DB=postgresql'
   end
 end
