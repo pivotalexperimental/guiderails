@@ -1,4 +1,5 @@
 DISPLAY_VAR = 'DISPLAY=:5.0'
+TEST_PROJECT_DIR = "/tmp/rails3_templates_test_projects"
 
 task :cruise => 'rails3_templates:test'
 
@@ -13,19 +14,13 @@ namespace :rails3_templates do
       raise "Build failed" if $? != 0
     end
 
-    def run_test_project(run_vars = '', clear_projects = false)
-      test_project_dir="/tmp/rails3_templates_test_projects"
+    def run_test_project(run_vars = '')
       test_project_filename="testproject_#{Time.now.strftime("%Y%m%d_%H%S")}"
-      test_project_path="#{test_project_dir}/#{test_project_filename}"
-      unless ENV['NO_DELETE_TEST_PROJECTS'] || clear_projects
-        # delete and recreate test project dir.
-        # This keeps it from growing forever on CI, but still leaves the last run to be inspected
-        FileUtils.rm_rf(test_project_dir)
-      end
-      FileUtils.mkdir_p(test_project_dir)
+      test_project_path="#{TEST_PROJECT_DIR}/#{test_project_filename}"
+
       begin
         template_project_path = File.dirname(__FILE__)
-        cd test_project_dir do
+        cd TEST_PROJECT_DIR do
           run "CRUISE=true #{run_vars} " +
               "rails new #{test_project_filename} -m #{template_project_path}/main.rb -J -T"
         end
@@ -44,7 +39,13 @@ namespace :rails3_templates do
       end
     end
 
-    run_test_project
+    unless ENV['NO_DELETE_TEST_PROJECTS']
+      # delete and recreate test project dir.
+      # This keeps it from growing forever on CI, but still leaves the last run to be inspected
+      FileUtils.rm_rf(TEST_PROJECT_DIR)
+    end
+    FileUtils.mkdir_p(TEST_PROJECT_DIR)
 
+    run_test_project
   end
 end
