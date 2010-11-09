@@ -23,19 +23,17 @@ namespace :rails3_templates do
     begin
       template_project_path = File.dirname(__FILE__)
       cd test_project_dir do
-        run "CRUISE=true TEMPLATE_PROJECT_PATH=#{template_project_path} " +
-                "SAUCELABS_USERNAME=pivotallabs " +
-                "SAUCELABS_ACCESS_KEY=YOURSAUCEAPIKEY " +
-                "rails new #{test_project_filename} -m #{template_project_path}/main.rb -J -T"
+        run "CRUISE=true " +
+            "rails new #{test_project_filename} -m #{template_project_path}/main.rb -J -T"
       end
       run "rvm rvmrc trust #{test_project_path}"
       cd test_project_path do
         run 'bundle install'
         run "rake spec"
-        run "nohup Xvfb :5.0 -screen 0 1024x768x8 &"
-        run "DISPLAY=:5.0 rake jasmine:ci"
-        run "DISPLAY=:5.0 rake spec:selenium"
-        run "DISPLAY=:5.0 rake spec:selenium:sauce"
+        run "nohup Xvfb #{ENV['DISPLAY']} -screen 0 1024x768x8 &"
+        run "rake jasmine:ci"
+        run "rake spec:selenium"
+        run "rake spec:selenium:sauce"
       end
     end
   end

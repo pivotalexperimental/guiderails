@@ -16,6 +16,7 @@ end
 # set RVM wrapper to switch environments
 run "rvm wrapper ree-1.8.7-2010.02@#{@project} #{@project}"
 
+# setup mocks for ccrb
 if ENV["CRUISE"]
   puts "Mocking responses for Cruise.rb"
   @responses = {
@@ -67,11 +68,12 @@ gem 'auto_tagger', '0.2.2'
 gem 'json', '1.4.6'
 gem 'heroku'
 
-# choices
+# gemfile groups
 @test_gems = []
 @dev_gems = []
 @dev_test_gems = []
 
+# gem choices
 if yes?("Do you want to use MySQL?")
   gem 'mysql2', '0.2.6'
   @database = 'mysql'
@@ -114,8 +116,7 @@ if yes?("Do you want the HAML (and SASS) gem?")
   gem 'haml-rails'
 end
 
-# gemfile injections
-
+# insert gemfile groups
 append_file "Gemfile" do
   delimiter = "\n  "
   <<-GROUPS
@@ -153,7 +154,6 @@ say "Running after Bundler callbacks."
 @after_blocks.each{|b| b.call}
 
 # final cleanups
-
 remove_dir "test"
 
 # update rspec mocking framework
