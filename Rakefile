@@ -29,10 +29,15 @@ namespace :rails3_templates do
         cd test_project_path do
           run 'bundle install'
           run "rake spec"
-          Headless.ly(:display => 42, :reuse => true) do
-            run "DISPLAY=:42 rake jasmine:ci"
-            run "DISPLAY=:42 rake spec:selenium"
-            run "DISPLAY=:42 rake spec:selenium:sauce"
+          Headless.ly(:display => 42, :reuse => true) do |headless|
+            begin
+              run "DISPLAY=:42 rake jasmine:ci"
+              run "DISPLAY=:42 rake spec:selenium"
+              run "DISPLAY=:42 rake spec:selenium:sauce"
+            rescue Exception => e
+              headless.destroy
+              raise e
+            end
           end
         end
       end
