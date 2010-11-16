@@ -1,4 +1,5 @@
-DISPLAY_VAR = 'DISPLAY=:5.0'
+require 'headless'
+
 TEST_PROJECT_DIR = "/tmp/rails3_templates_test_projects"
 
 task :cruise => 'rails3_templates:test'
@@ -28,13 +29,11 @@ namespace :rails3_templates do
         cd test_project_path do
           run 'bundle install'
           run "rake spec"
-          # can't work when run as an init.d; call each time before build to make sure it's running
-          run "pidof Xvfb && nohup Xvfb :5.0 -screen 0 1024x768x8 &"
-
-          # have to explicitly set DISPLAY env var. the shell-out can't can't reference it in the bash.rc.
-          run "#{DISPLAY_VAR} rake jasmine:ci"
-          run "#{DISPLAY_VAR} rake spec:selenium"
-          run "#{DISPLAY_VAR} rake spec:selenium:sauce"
+          Headless.ly(:display => 42, :reuse => true) do
+            run "DISPLAY=:42 rake jasmine:ci"
+            run "DISPLAY=:42 rake spec:selenium"
+            run "DISPLAY=:42 rake spec:selenium:sauce"
+          end
         end
       end
     end
