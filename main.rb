@@ -22,7 +22,7 @@ if ENV["CRUISE"]
   @responses = {
     "Do you want to use MySQL?" => true,
     "Do you want RR?" => true,
-    "Do you want to use Webrat with Sauce Labs support?" => false,
+    "Do you want to use Webrat with Sauce Labs support?" => true,
     "Do you want the HAML (and SASS) gem?" => true
   }
 
@@ -269,7 +269,7 @@ task :cruise do
   Rake::Task["spec"].invoke
   Headless.ly(:display => 42) do |headless|
     begin
-      Rake::Task["jasmine:ci"].invoke
+      #Rake::Task["jasmine:ci"].invoke
       Rake::Task["spec:selenium"].invoke
       Rake::Task["spec:selenium:sauce"].invoke
     ensure
