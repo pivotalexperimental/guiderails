@@ -266,15 +266,14 @@ chmod "cruise_build.sh", 0755
 append_file 'Rakefile' do <<-DOC
 
 task :cruise do
-  system "rake spec"
+  Rake::Task["spec"].invoke
   Headless.ly(:display => 42) do |headless|
     begin
-      system "DISPLAY=:42 && rake jasmine:ci"
-      system "DISPLAY=:42 && rake spec:selenium"
-      system "DISPLAY=:42 && rake spec:selenium:sauce"
-    rescue Exception => e
+      Rake::Task["jasmine:ci"].invoke
+      Rake::Task["spec:selenium"].invoke
+      Rake::Task["spec:selenium:sauce"].invoke
+    ensure
       headless.destroy
-      raise e
     end
   end
 end
