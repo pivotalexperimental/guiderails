@@ -8,7 +8,7 @@ end
 @after_blocks = []
 def after_bundler(&block); @after_blocks << block; end
 
-RUN_RUBY_PREFIX = "MY_RUBY_HOME=~/.rvm/bin/#{@project}_ruby" 
+RUN_RUBY_PREFIX = "MY_RUBY_HOME=$HOME/.rvm/bin/#{@project}_ruby" 
 def run_ruby(command)
   run "#{RUN_RUBY_PREFIX} #{command}"
 end
@@ -22,7 +22,7 @@ if ENV["CRUISE"]
   @responses = {
     "Do you want to use MySQL?" => true,
     "Do you want RR?" => true,
-    "Do you want to use Webrat with Sauce Labs support?" => true,
+    "Do you want to use Webrat with Sauce Labs support?" => false,
     "Do you want the HAML (and SASS) gem?" => true
   }
 
