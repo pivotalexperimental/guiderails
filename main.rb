@@ -130,6 +130,7 @@ group :development, :test do
   gem 'mongrel', '1.1.5'
   gem 'rspec-rails', '2.0.1'
   gem 'jasmine', '1.0.1.1'
+  gem "headless", "0.1.0"
 
   #{@dev_test_gems.join(delimiter)}
 end
@@ -240,4 +241,43 @@ RSpec::Core::RakeTask.new(:spec) do |t|
   t.pattern = "./spec/{requests,models,controllers,views,helpers,mailers,lib,routing}/**/*_spec.rb"
 end
 FILE
+end
+
+file 'cruise_build.sh' do <<-FILE
+#!/usr/bin/env bash
+
+source $HOME/.rvm/scripts/rvm && source .rvmrc
+
+# install bundler if necessary
+gem list --local bundler | grep bundler || gem install bundler || exit 1
+
+# debugging info
+echo USER=$USER && ruby --version && which ruby && which bundle
+
+# conditionally install project gems from Gemfile
+bundle check || bundle install || exit 1
+
+rake cruise
+FILE
+end
+
+chmod "cruise_build.sh", 0755
+
+append_file 'Rakefile' do <<-DOC
+
+task :cruise do
+  system "rake spec"
+  Headless.ly(:display => 42) do |headless|
+    begin
+      system "DISPLAY=:42 && rake jasmine:ci"
+      system "DISPLAY=:42 && rake spec:selenium"
+      system "DISPLAY=:42 && rake spec:selenium:sauce"
+    rescue Exception => e
+      headless.destroy
+      raise e
+    end
+  end
+end
+
+DOC
 end

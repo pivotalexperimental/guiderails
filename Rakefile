@@ -25,22 +25,7 @@ namespace :rails3_templates do
           run "CRUISE=true #{run_vars} " +
               "rails new #{test_project_filename} -m #{template_project_path}/main.rb -J -T"
         end
-        run "rvm rvmrc trust #{test_project_path}"
-        cd test_project_path do
-          run '`cat .rvmrc` && gem install bundler'
-          run '`cat .rvmrc` && bundle install'
-          run "`cat .rvmrc` && rake spec"
-          Headless.ly(:display => 42, :reuse => true) do |headless|
-            begin
-              run "`cat .rvmrc` && DISPLAY=:42 rake jasmine:ci"
-              run "`cat .rvmrc` && DISPLAY=:42 rake spec:selenium"
-              run "`cat .rvmrc` && DISPLAY=:42 rake spec:selenium:sauce"
-            rescue Exception => e
-              headless.destroy
-              raise e
-            end
-          end
-        end
+        run "cd #{test_project_path} && ./cruise_build.sh"
       end
     end
 
