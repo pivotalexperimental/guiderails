@@ -19,14 +19,12 @@ namespace :rails3_templates do
       test_project_filename="testproject_#{Time.now.strftime("%Y%m%d_%H%S")}"
       test_project_path="#{TEST_PROJECT_DIR}/#{test_project_filename}"
 
-      begin
-        template_project_path = File.dirname(__FILE__)
-        cd TEST_PROJECT_DIR do
-          run "CRUISE=true #{run_vars} " +
-              "rails new #{test_project_filename} -m #{template_project_path}/main.rb -J -T"
-        end
-        run "cd #{test_project_path} && ./cruise_build.sh"
+      template_project_path = File.dirname(__FILE__)
+      cd TEST_PROJECT_DIR do
+        run "CRUISE=true #{run_vars} " +
+                "rails new #{test_project_filename} -m #{template_project_path}/main.rb -J -T"
       end
+      run "cd #{test_project_path} && ./cruise_build.sh"
     end
 
     unless ENV['NO_DELETE_TEST_PROJECTS']
