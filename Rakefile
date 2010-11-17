@@ -24,6 +24,7 @@ namespace :rails3_templates do
         run "CRUISE=true #{run_vars} " +
                 "rails new #{test_project_filename} -m #{template_project_path}/main.rb -J -T"
       end
+      run "rvm rvmrc trust #{test_project_path}"
       run "cd #{test_project_path} && ./cruise_build.sh"
     end
 
@@ -35,6 +36,6 @@ namespace :rails3_templates do
     FileUtils.mkdir_p(TEST_PROJECT_DIR)
 
     run_test_project
-    run_test_project 'TEMPLATE_DB=postgresql'
+    #run_test_project 'TEMPLATE_DB=postgresql'
   end
 end
