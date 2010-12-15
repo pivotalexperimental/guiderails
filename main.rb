@@ -45,7 +45,7 @@ run "git init" unless File.exist?(".git")
 inside "public/javascripts" do
   wget "http://github.com/rails/jquery-ujs/raw/master/src/rails.js", "rails.js"
   FileUtils.mkdir_p('jquery')
-  wget "http://code.jquery.com/jquery-1.4.2.min.js",                 "jquery/jquery.min.js"
+  wget "http://code.jquery.com/jquery-1.4.4.min.js",                 "jquery/jquery.min.js"
 end
 
 application do
@@ -266,12 +266,13 @@ chmod "cruise_build.sh", 0755
 append_file 'Rakefile' do <<-DOC
 
 task :cruise do
-  Rake::Task["spec"].invoke
+  sh 'rake spec'
+  # headless is your friend on linux - http://www.aentos.com/blog/easy-setup-your-cucumber-scenarios-using-headless-gem-run-selenium-your-ci-server
   Headless.ly(:display => 42) do |headless|
     begin
-      #Rake::Task["jasmine:ci"].invoke
-      Rake::Task["spec:selenium"].invoke
-      Rake::Task["spec:selenium:sauce"].invoke
+      sh 'rake jasmine:ci'
+      sh 'rake spec:selenium'
+      sh 'rake spec:selenium:sauce'
     ensure
       headless.destroy
     end

@@ -1,5 +1,3 @@
-require 'headless'
-
 TEST_PROJECT_DIR = "/tmp/rails3_templates_test_projects"
 
 task :cruise => 'rails3_templates:test'
