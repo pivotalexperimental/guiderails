@@ -83,7 +83,7 @@ if yes?("Do you want to use MySQL?")
   gem 'mysql2', '0.2.6'
   @database = 'mysql'
 elsif yes?("Or PostgreSql?")
-  gem 'pg', '0.9.0'
+  gem 'pg', '0.11.0'
   @database = 'postgresql'
 end
 
