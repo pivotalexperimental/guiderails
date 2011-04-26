@@ -14,7 +14,7 @@ def run_ruby(command)
 end
 
 # set RVM wrapper to switch environments
-run "rvm wrapper ree-1.8.7-2010.02@#{@project} #{@project}"
+run "rvm wrapper ruby-1.9.2-p180@#{@project} #{@project}"
 
 # setup mocks for ccrb
 if ENV["CRUISE"]
@@ -56,7 +56,7 @@ gsub_file "config/application.rb", /# JavaScript.*\n/, ""
 gsub_file "config/application.rb", /# config\.action_view\.javascript.*\n/, ""
 
 # gems
-create_file ".rvmrc", "rvm --create ree-1.8.7-2010.02@#{@project}"
+create_file ".rvmrc", "rvm --create ruby-1.9.2-p180@#{@project}"
 
 # clean up Gemfile
 gsub_file 'Gemfile', /gem 'sqlite/, "# gem 'sqlite"
