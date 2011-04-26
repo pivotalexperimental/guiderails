@@ -127,7 +127,6 @@ append_file "Gemfile" do
   <<-GROUPS
 
 group :development, :test do
-  gem 'mongrel', '1.1.5'
   gem 'rspec-rails', '2.0.1'
   gem 'jasmine', '1.0.1.1'
   gem "headless", "0.1.0"
