@@ -96,6 +96,7 @@ elsif yes?("Or mocha?")
 end
 
 if yes?("Do you want to use Webrat with Sauce Labs support?")
+  @sauce = true
   @dev_test_gems.push("gem 'webrat', '0.7.2'")
   @dev_test_gems.push("gem 'net-ssh', '2.0.23'")
   @dev_test_gems.push("gem 'net-ssh-gateway', '1.0.1'")
@@ -108,6 +109,7 @@ if yes?("Do you want to use Webrat with Sauce Labs support?")
     gsub_file "config/selenium.yml", "YOUR-SAUCELABS-ACCESS-KEY", "YOURSAUCEAPIKEY"
   end
 elsif yes?("Or Cucumber with Capybara (doesn't work with Sauce Labs)?")
+  @cucumber = true
   @dev_test_gems.push("gem 'cucumber-rails', '0.3.2'")
   @dev_test_gems.push("gem 'capybara', '0.4.0'")
 
@@ -270,8 +272,8 @@ task :cruise do
   Headless.ly(:display => 42) do |headless|
     begin
       sh 'rake jasmine:ci'
-      sh 'rake spec:selenium'
-      sh 'rake spec:selenium:sauce'
+      #{"sh 'rake spec:selenium'" if @cucumber || @sauce }
+      #{"sh 'rake spec:selenium:sauce'" if @sauce }
     ensure
       headless.destroy
     end
