@@ -11,7 +11,4 @@ echo USER=$USER && ruby --version && which ruby && which bundle
 # conditionally install project gems from Gemfile
 bundle check || bundle install || exit 1
 
-RAILS_ENV=development rake db:version > /dev/null || rake db:create
-RAILS_ENV=test rake db:version  > /dev/null || rake db:create
-
 rake cruise
