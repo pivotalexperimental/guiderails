@@ -2,7 +2,7 @@ Guiderails: Pivotal's Rails 3 Templates
 ================================
 
 # How?
-rails new <my project name> -m https://github.com/pivotal/guiderails/raw/master/main.rb
+rails new APPNAME -m https://github.com/pivotal/guiderails/raw/master/main.rb
 
 # What are my choices?
 * Mysql or Postgres
