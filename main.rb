@@ -130,8 +130,8 @@ append_file "Gemfile" do
   <<-GROUPS
 
 group :development, :test do
-  gem 'jasmine', '1.0.1.1'
   gem 'rspec-rails', '2.6.1'
+  gem 'jasmine', '1.1.0'
   gem "headless", "0.1.0"
 
   #{@dev_test_gems.join(delimiter)}
