@@ -23,7 +23,7 @@ if ENV["CRUISE"]
     "Do you want to use MySQL?" => true,
     "Do you want RR?" => true,
     "Do you want to use Webrat with Sauce Labs support?" => true,
-    "Do you want the HAML (and SASS) gem?" => true
+    "Do you want the HAML gem?" => true
   }
 
   if (ENV['TEMPLATE_DB'] == 'postgresql')
@@ -118,9 +118,9 @@ elsif yes?("Or Cucumber with Capybara (doesn't work with Sauce Labs)?")
   end
 end
 
-if yes?("Do you want the HAML (and SASS) gem?")
-  gem 'haml', '>= 3.0.0'
-  gem 'haml-rails'
+if yes?("Do you want the HAML gem?")
+  gem 'haml', '~> 3.1.3'
+  gem 'haml-rails', '~> 0.3.4'
 end
 
 # insert gemfile groups
