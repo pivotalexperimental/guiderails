@@ -69,7 +69,7 @@ inject_into_file 'Gemfile', :after => /gem 'rails'.*$/ do
 end
 
 gem 'bundler'
-gem 'auto_tagger', '0.2.2'
+gem 'auto_tagger', '0.2.3'
 gem 'json', '1.4.6'
 gem 'heroku'
 
