@@ -110,8 +110,9 @@ if yes?("Do you want to use Webrat with Sauce Labs support?")
   end
 elsif yes?("Or Cucumber with Capybara (doesn't work with Sauce Labs)?")
   @cucumber = true
-  @dev_test_gems.push("gem 'cucumber-rails', '0.3.2'")
-  @dev_test_gems.push("gem 'capybara', '0.4.0'")
+  @dev_test_gems.push("gem 'cucumber-rails', '1.0.4'")
+  @dev_test_gems.push("gem 'capybara', '1.1.1'")
+  @dev_test_gems.push("gem 'database_cleaner', '0.6.7'")
 
   after_bundler do
     run_ruby "rails g cucumber:install --capybara --rspec"
