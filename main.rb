@@ -188,12 +188,20 @@ if @database
   # re-generated from your development database when you run 'rake'.
   # Do not set this db to the same as development or production.
   test:
-    <<: *development
+    adapter: #{@database == 'mysql' ? 'mysql2' : 'postgresql'}
     database: #{@project}_test
+    username: #{@database == 'mysql' ? 'root' : 'postgres'}
+    password: #{@database == 'mysql' || ENV['CRUISE'] ? 'password' : ''}
+    host: localhost
+    #{ENV['CRUISE'] && @database == 'mysql' ? 'socket: /tmp/mysql.sock' : ''}
 
   production:
-    <<: *development
+    adapter: #{@database == 'mysql' ? 'mysql2' : 'postgresql'}
     database: #{@project}_production
+    username: #{@database == 'mysql' ? 'root' : 'postgres'}
+    password: #{@database == 'mysql' || ENV['CRUISE'] ? 'password' : ''}
+    host: localhost
+    #{ENV['CRUISE'] && @database == 'mysql' ? 'socket: /tmp/mysql.sock' : ''}
   EOS
   end
 end
