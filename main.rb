@@ -175,34 +175,32 @@ end
 # update database.yml
 if @database
   remove_file "config/database.yml"
-  file "config/database.yml" do <<-EOS
-  development: &development
+  database_yml_content = ""
+
+  def database_environment(env_name, env_suffix)
+    <<-EOC
+  #{env_name}:
     adapter: #{@database == 'mysql' ? 'mysql2' : 'postgresql'}
-    database: #{@project}_dev
+    database: #{@project}_#{env_suffix}
     username: #{@database == 'mysql' ? 'root' : 'postgres'}
     password: #{@database == 'mysql' || ENV['CRUISE'] ? 'password' : ''}
     host: localhost
     #{ENV['CRUISE'] && @database == 'mysql' ? 'socket: /tmp/mysql.sock' : ''}
 
+    EOC
+  end
+
+  database_yml_content << database_environment("development", "dev")
+  database_yml_content << <<-EOS
   # Warning: The database defined as 'test' will be erased and
   # re-generated from your development database when you run 'rake'.
   # Do not set this db to the same as development or production.
-  test:
-    adapter: #{@database == 'mysql' ? 'mysql2' : 'postgresql'}
-    database: #{@project}_test
-    username: #{@database == 'mysql' ? 'root' : 'postgres'}
-    password: #{@database == 'mysql' || ENV['CRUISE'] ? 'password' : ''}
-    host: localhost
-    #{ENV['CRUISE'] && @database == 'mysql' ? 'socket: /tmp/mysql.sock' : ''}
-
-  production:
-    adapter: #{@database == 'mysql' ? 'mysql2' : 'postgresql'}
-    database: #{@project}_production
-    username: #{@database == 'mysql' ? 'root' : 'postgres'}
-    password: #{@database == 'mysql' || ENV['CRUISE'] ? 'password' : ''}
-    host: localhost
-    #{ENV['CRUISE'] && @database == 'mysql' ? 'socket: /tmp/mysql.sock' : ''}
   EOS
+  database_yml_content << database_environment("test", "test")
+  database_yml_content << database_environment("production", "production")
+  
+  file "config/database.yml" do
+    database_yml_content
   end
 end
 
