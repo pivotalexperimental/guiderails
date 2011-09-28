@@ -22,7 +22,7 @@ if ENV["CRUISE"]
   @responses = {
     "Do you want to use MySQL?" => true,
     "Do you want RR?" => true,
-    "Do you want to use Webrat with Sauce Labs support?" => true,
+    "Do you want to use Webrat with Sauce Labs support?" => false,
     "Do you want the HAML gem?" => true
   }
 
@@ -61,7 +61,7 @@ create_file ".rvmrc", "rvm --create ruby-1.9.2-p180@#{@project}"
 # clean up Gemfile
 gsub_file 'Gemfile', /gem 'sqlite/, "# gem 'sqlite"
 gsub_file 'Gemfile', /#.*$/, ''
-gsub_file 'Gemfile', /\n[\n]+$/, ''
+gsub_file 'Gemfile', /\n[\n]+$/, "\n"
 
 # default gems
 inject_into_file 'Gemfile', :after => /gem 'rails'.*$/ do
