@@ -8,7 +8,7 @@ end
 @after_blocks = []
 def after_bundler(&block); @after_blocks << block; end
 
-RUN_RUBY_PREFIX = "MY_RUBY_HOME=$HOME/.rvm/bin/#{@project}_ruby" 
+RUN_RUBY_PREFIX = "MY_RUBY_HOME=$HOME/.rvm/bin/#{@project}_ruby"
 def run_ruby(command)
   run "#{RUN_RUBY_PREFIX} #{command}"
 end
@@ -102,7 +102,7 @@ if yes?("Do you want to use Webrat with Sauce Labs support?")
   @dev_test_gems.push("gem 'net-ssh-gateway', '1.0.1'")
   @dev_test_gems.push("gem 'rest-client', '1.6.1'")
   @dev_test_gems.push("gem 'saucelabs_adapter', :git => 'git://github.com/pivotal/saucelabs-adapter.git', :branch => 'rails3', :submodules => true")
-  
+
   after_bundler do
     run_ruby "rails g saucelabs_adapter"
     gsub_file "config/selenium.yml", "YOUR-SAUCELABS-USERNAME", "pivotallabs"
@@ -198,7 +198,7 @@ if @database
   EOS
   database_yml_content << database_environment("test", "test")
   database_yml_content << database_environment("production", "production")
-  
+
   file "config/database.yml" do
     database_yml_content
   end
@@ -267,6 +267,8 @@ bundle check || bundle install || exit 1
 
 RAILS_ENV=development rake db:version > /dev/null || rake db:create
 RAILS_ENV=test rake db:version  > /dev/null || rake db:create
+
+RAILS_ENV=development rake db:migrate test:prepare
 
 rake cruise
 FILE
