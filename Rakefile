@@ -23,7 +23,7 @@ namespace :rails3_templates do
                 "rails new #{test_project_filename} -m #{template_project_path}/main.rb -J -T"
       end
       run "rvm rvmrc trust #{test_project_path}"
-      run "cd #{test_project_path} && ./cruise_build.sh"
+      run "cd #{test_project_path} && rake spec"
     end
 
     unless ENV['NO_DELETE_TEST_PROJECTS']

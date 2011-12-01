@@ -70,7 +70,6 @@ end
 
 gem 'bundler'
 gem 'auto_tagger', '0.2.3'
-gem 'json', '1.4.6'
 gem 'heroku'
 
 # gemfile groups
@@ -249,48 +248,4 @@ RSpec::Core::RakeTask.new(:spec) do |t|
   t.pattern = "./spec/{requests,models,controllers,views,helpers,mailers,lib,routing}/**/*_spec.rb"
 end
 FILE
-end
-
-file 'cruise_build.sh' do <<-FILE
-#!/usr/bin/env bash
-
-source $HOME/.rvm/scripts/rvm && source .rvmrc
-
-# install bundler if necessary
-gem list --local bundler | grep bundler || gem install bundler || exit 1
-
-# debugging info
-echo USER=$USER && ruby --version && which ruby && which bundle
-
-# conditionally install project gems from Gemfile
-bundle check || bundle install || exit 1
-
-RAILS_ENV=development rake db:version > /dev/null || rake db:create
-RAILS_ENV=test rake db:version  > /dev/null || rake db:create
-
-RAILS_ENV=development rake db:migrate test:prepare
-
-rake cruise
-FILE
-end
-
-chmod "cruise_build.sh", 0755
-
-append_file 'Rakefile' do <<-DOC
-
-task :cruise do
-  sh 'rake spec'
-  # headless is your friend on linux - http://www.aentos.com/blog/easy-setup-your-cucumber-scenarios-using-headless-gem-run-selenium-your-ci-server
-  Headless.ly(:display => 42) do |headless|
-    begin
-      sh 'rake jasmine:ci'
-      #{"sh 'rake spec:selenium'" if @cucumber || @sauce }
-      #{"sh 'rake spec:selenium:sauce'" if @sauce }
-    ensure
-      headless.destroy
-    end
-  end
-end
-
-DOC
 end
