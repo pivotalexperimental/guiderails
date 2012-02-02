@@ -79,27 +79,27 @@ gem 'heroku'
 
 # gem choices
 if yes?("Do you want to use MySQL?")
-  gem 'mysql2', '0.2.6'
+  gem 'mysql2'
   @database = 'mysql'
 elsif yes?("Or PostgreSql?")
-  gem 'pg', '0.11.0'
+  gem 'pg'
   @database = 'postgresql'
 end
 
 if yes?("Do you want RR?")
-  @test_gems.push("gem 'rr', '1.0.2'")
+  @test_gems.push("gem 'rr'")
   @mock_framework = 'rr'
 elsif yes?("Or mocha?")
-  @test_gems.push("gem 'mocha', '0.9.9'")
+  @test_gems.push("gem 'mocha'")
   @mock_framework = 'mocha'
 end
 
 if yes?("Do you want to use Webrat with Sauce Labs support?")
   @sauce = true
-  @dev_test_gems.push("gem 'webrat', '0.7.2'")
-  @dev_test_gems.push("gem 'net-ssh', '2.0.23'")
-  @dev_test_gems.push("gem 'net-ssh-gateway', '1.0.1'")
-  @dev_test_gems.push("gem 'rest-client', '1.6.1'")
+  @dev_test_gems.push("gem 'webrat'")
+  @dev_test_gems.push("gem 'net-ssh'")
+  @dev_test_gems.push("gem 'net-ssh-gateway'")
+  @dev_test_gems.push("gem 'rest-client'")
   @dev_test_gems.push("gem 'saucelabs_adapter', :git => 'git://github.com/pivotal/saucelabs-adapter.git', :branch => 'rails3', :submodules => true")
 
   after_bundler do
@@ -109,9 +109,9 @@ if yes?("Do you want to use Webrat with Sauce Labs support?")
   end
 elsif yes?("Or Cucumber with Capybara (doesn't work with Sauce Labs)?")
   @cucumber = true
-  @dev_test_gems.push("gem 'cucumber-rails', '1.0.4'")
-  @dev_test_gems.push("gem 'capybara', '1.1.1'")
-  @dev_test_gems.push("gem 'database_cleaner', '0.6.7'")
+  @dev_test_gems.push("gem 'cucumber-rails'")
+  @dev_test_gems.push("gem 'capybara'")
+  @dev_test_gems.push("gem 'database_cleaner'")
 
   after_bundler do
     run_ruby "rails g cucumber:install --capybara --rspec"
@@ -119,8 +119,8 @@ elsif yes?("Or Cucumber with Capybara (doesn't work with Sauce Labs)?")
 end
 
 if yes?("Do you want the HAML gem?")
-  gem 'haml', '~> 3.1.3'
-  gem 'haml-rails', '~> 0.3.4'
+  gem 'haml'
+  gem 'haml-rails'
 end
 
 # insert gemfile groups
@@ -129,9 +129,9 @@ append_file "Gemfile" do
   <<-GROUPS
 
 group :development, :test do
-  gem 'rspec-rails', '2.6.1'
-  gem 'jasmine', '1.1.0'
-  gem "headless", "0.1.0"
+  gem 'rspec-rails'
+  gem 'jasmine'
+  gem "headless"
 
   #{@dev_test_gems.join(delimiter)}
 end
