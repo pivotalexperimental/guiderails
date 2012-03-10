@@ -17,7 +17,7 @@ rails new APPNAME -m https://github.com/pivotal/guiderails/raw/master/main.rb
 * An rvmrc
 * Bundler, auto-tagger, JSON, Heroku, rspec-rails, Jasmine, and Headless gems (in the global or development groups)
 * Jasmine initialized for JavaScript testing
-* Respec installed
+* Rspec installed
 * Some testing related rake tasks
 
 # Contributions
