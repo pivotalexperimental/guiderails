@@ -1,5 +1,6 @@
 TEST_PROJECT_DIR = "/tmp/rails3_templates_test_projects"
 
+task :default => 'rails3_templates:test'
 task :cruise => 'rails3_templates:test'
 
 namespace :rails3_templates do
