@@ -1,1 +1,1 @@
-rvm --create ree-1.8.7-2012.02@rails3-templates
+rvm --create ruby-1.9.3-p125@rails3-templates
