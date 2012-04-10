@@ -24,6 +24,7 @@ namespace :rails3_templates do
                 "rails new #{test_project_filename} -m #{template_project_path}/main.rb -J -T"
       end
       run "rvm rvmrc trust #{test_project_path}"
+      run "cd #{test_project_path} && rake db:create:all db:migrate db:test:prepare"
       run "cd #{test_project_path} && rake spec"
     end
 
@@ -35,6 +36,6 @@ namespace :rails3_templates do
     FileUtils.mkdir_p(TEST_PROJECT_DIR)
 
     run_test_project
-    #run_test_project 'TEMPLATE_DB=postgresql'
+    run_test_project 'TEMPLATE_DB=postgresql'
   end
 end
