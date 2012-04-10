@@ -1,3 +1,5 @@
+TEMPLATE_RUBY_VERSION = "ruby-1.9.3-p125"
+
 @root = File.expand_path(File.directory?('') ? '' : File.join(Dir.pwd, ''))
 @project = @root.split("/").last
 
@@ -14,7 +16,7 @@ def run_ruby(command)
 end
 
 # set RVM wrapper to switch environments
-run "rvm wrapper ruby-1.9.2-p180@#{@project} #{@project}"
+run "rvm wrapper #{TEMPLATE_RUBY_VERSION}@#{@project} #{@project}"
 
 # setup mocks for ccrb
 if ENV["CRUISE"]
@@ -56,7 +58,7 @@ gsub_file "config/application.rb", /# JavaScript.*\n/, ""
 gsub_file "config/application.rb", /# config\.action_view\.javascript.*\n/, ""
 
 # gems
-create_file ".rvmrc", "rvm --create ruby-1.9.2-p180@#{@project}"
+create_file ".rvmrc", "rvm --create #{TEMPLATE_RUBY_VERSION}@#{@project}"
 
 # clean up Gemfile
 gsub_file 'Gemfile', /gem 'sqlite/, "# gem 'sqlite"
